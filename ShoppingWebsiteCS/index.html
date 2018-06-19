@@ -1,0 +1,202 @@
+<html>
+<head>
+	<meta charset="UTF-8"/>
+	<script src="./js/react.js"> </script>
+	<script src="./js/react-dom.js"> </script>
+	<script src="./js/babel.min.js"> </script>
+    
+		<script type="text/babel">
+
+        class ShoopingWebsite extends React.Component{
+            
+            constructor(){
+                super();
+                this.state={
+                    isUserAuthenticated:false,
+                    loggedinUser:""
+                }
+                this.setUserAuthenticated=this.setUserAuthenticated.bind(this);
+            }
+
+            setUserAuthenticated(status,loggedinUserName){
+                this.setState({
+                    isUserAuthenticated:status,
+                    loggedinUser:loggedinUserName
+                });
+            }
+               render(){
+				return (<div>
+                       <HeaderComponent isUserLoggedIn={this.state.isUserAuthenticated} loggedinUser={this.state.loggedinUser}/>
+                       <MainComponent setUserAuthenticated={this.setUserAuthenticated} isUserAuthenticated={this.state.isUserAuthenticated}/>
+                       <FooterComponent/>
+                    </div>);
+				}
+			}
+            		
+            class HeaderComponent extends React.Component{
+              constructor(){
+               super();
+             }
+
+            render(){
+                 if(this.props.isUserLoggedIn){
+                 return(
+                <div id="headerComponent" className="headerComponent flexdisplay">
+                    <div>
+                     Welcome : {this.props.loggedinUser}
+                    </div>
+                </div>
+                );
+               }
+             else{
+                 return(
+                <div id="headerComponent" className="headerComponent flexdisplay">
+                    <div>
+                     E Shopping 
+                    </div>
+                </div>
+                );
+                }             
+            }        
+         }
+
+       class MainComponent extends React.Component{      
+            constructor(){
+                super();
+                this.state={
+                    userId:"",
+                    password:"",
+                    cartList:[]
+                }
+                this.addToCart=this.addToCart.bind(this);
+                this.loginUser=this.loginUser.bind(this);
+            }
+
+            loginUser(){
+                var userId=document.getElementById("userId").value;
+                var password=document.getElementById("password").value;
+                 if(userId==="prashant" && password==="123"){
+                  this.props.setUserAuthenticated(true,userId);
+                }
+            }
+        
+            addToCart(item){
+                let newList=this.state.cartList;
+                newList.push(item);
+               this.setState({
+                    cartList:newList
+               });
+            }
+
+        render(){
+            if(this.props.isUserAuthenticated){
+               return(<div>
+                <ProductListComponent addToCart={this.addToCart}/>
+                <CartListComponent cartItmes={this.state.cartList}/>
+                </div>
+               );
+            }
+            else{
+                 return(
+                <div id="mainContentComponent" className="mainContentComponent flexdisplay">
+                    Login id: <input type='text' id="userId"/>
+                    Password: <input type='password' id="password"/>
+                    <button onClick={(e)=>this.loginUser()}>Login</button>
+                </div>
+            );
+            }
+        }        
+     }
+
+     class ProductListComponent extends React.Component{
+              constructor(){
+                super();
+                this.state={
+                 productList:[
+                    {id:0,productName:"Mobile",productPrice:30000},
+                    {id:1,productName:"Fridge",productPrice:40000},
+                    {id:2,productName:"Tv",productPrice:50000},
+                    {id:3,productName:"Home Theater",productPrice:35000},
+                    {id:4,productName:"Hard Disk",productPrice:4000},
+                    {id:5,productName:"Laptop",productPrice:45000},
+                    ]
+                }
+            }
+
+            render(){         
+                return(
+                    <div>
+                      { this.state.productList.map((item)=>
+                        <ProductItemComponent productItem={item} key={item.id} addToCartItem={this.props.addToCart}/>
+                       )
+                     }
+                    </div>
+                )
+            }
+     }
+
+     class ProductItemComponent extends React.Component{
+       constructor(){
+           super();
+       }
+        render(){
+            return(
+                <div>
+                    <p>
+                        <section>Product Name  : {this.props.productItem.productName}</section>
+                        <section>Product Price : {this.props.productItem.productPrice}</section>
+                        <button onClick={ (e)=>this.props.addToCartItem(this.props.productItem) }>Add To Cart</button>
+                    </p>
+
+                </div>
+            );
+        }
+     }
+
+    const FooterComponent=(props)=>(
+        <div id="footerComponent" className="footerComponent flexdisplay">
+               Developed By: Prashant Chauhan
+             </div>);
+
+    class CartListComponent extends React.Component{
+        constructor(){
+            super();
+            this.state={
+                billValue:0
+            }
+            this.calCulateTotal=this.calCulateTotal.bind(this);
+        }
+        
+        calCulateTotal(){
+            let totalAmount=0;
+            this.props.cartItmes.forEach((item)=>totalAmount+=item.productPrice);
+            this.setState({
+                billValue:totalAmount
+            });
+        }
+
+      render(){
+        return(
+            <div> Cart Items:
+                <ul>
+                  {this.props.cartItmes.map((item)=><li key={item.id}>{item.productName}</li>)}
+                </ul>
+                <button onClick= { (e)=>this.calCulateTotal() }>Buy</button>
+                <section>Final Bill Value :Rs. {this.state.billValue} </section>
+            </div>);
+         }        
+    }
+
+    	function onload(){
+			ReactDOM.render( <ShoopingWebsite/>,document.getElementById("main"));
+			}
+		</script>
+	
+</head>
+
+<body onload="onload()">
+	<div id="main">
+	</div>
+</body>
+
+</html>
